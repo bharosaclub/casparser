@@ -4,31 +4,25 @@ import re
 from typing import Dict, Optional, Tuple
 
 from dateutil import parser as date_parser
-from regex import AMC_RE, DETAILED_DATE_RE, FOLIO_RE, SCHEME_RE, REGISTRAR_RE
-from regex import CLOSE_UNITS_RE, NAV_RE, OPEN_UNITS_RE, VALUATION_RE, DESCRIPTION_TAIL_RE
-from regex import DIVIDEND_RE, TRANSACTION_RE1, TRANSACTION_RE2, TRANSACTION_RE3, TRANSACTION_RE4
-from utils import isin_search
-from enu import TransactionType, CASFileType
-from typ import FolioType, SchemeType
-from excep import HeaderParseError, CASParseError
-import pyperclip
-# from get_text import cas_pdf_to_text
-from get_txt import raw
+
+from ..enums import TransactionType, CASFileType
+from ..exceptions import HeaderParseError, CASParseError
+from .regex import AMC_RE, DETAILED_DATE_RE, FOLIO_RE, SCHEME_RE, REGISTRAR_RE
+from .regex import CLOSE_UNITS_RE, NAV_RE, OPEN_UNITS_RE, VALUATION_RE, DESCRIPTION_TAIL_RE
+from .regex import DIVIDEND_RE, TRANSACTION_RE1, TRANSACTION_RE2, TRANSACTION_RE3
+from ..types import FolioType, SchemeType
+from .utils import isin_search
+
 ParsedTransaction = namedtuple(
     "ParsedTransaction", ("date", "description", "amount", "units", "nav", "balance")
 )
-date_re = r"(\d{2}-[A-Za-z]{3}-\d{4})"
+
 
 def str_to_decimal(value: Optional[str]) -> Decimal:
     if isinstance(value, str):
         return Decimal(value.replace(",", "_").replace("(", "-"))
 
-# with open('D:\Coding Projects\internship_projects\identifynominees\password.txt') as f:
-#     lines = f.readlines()
-# data = cas_pdf_to_text("D:/teststatement.pdf", lines[0])
-# data_p = "\u2029".join(data[2])
-# txt = data[2]
-# txt_raw = ''
+
 def parse_header(text):
     """
     Parse CAS header data.
@@ -38,9 +32,7 @@ def parse_header(text):
         return m.groupdict()
     raise HeaderParseError("Error parsing CAS header")
 
-# for line in txt[:10]:
-#     hdr_data = parse_header(line[:1000])
-# '18-Aug-2021 ***Change of Gender***'
+
 def get_transaction_type(
     description: str, units: Optional[Decimal]
 ) -> Tuple[TransactionType, Optional[Decimal]]:
@@ -102,13 +94,9 @@ def get_transaction_type(
 
 
 def parse_transaction(line) -> Optional[ParsedTransaction]:
-    for regex in (TRANSACTION_RE1, TRANSACTION_RE2, TRANSACTION_RE3, TRANSACTION_RE4):
+    for regex in (TRANSACTION_RE1, TRANSACTION_RE2, TRANSACTION_RE3):
         if m := re.search(regex, line, re.DOTALL | re.MULTILINE | re.I):
-            pyperclip.copy(line)
-            spam = pyperclip.paste()
             groups = m.groups()
-            # print(groups.count(None))
-            # print(regex)
             date = description = amount = units = nav = balance = None
             if groups.count(None) == 3:
                 # Tax entries
@@ -116,9 +104,6 @@ def parse_transaction(line) -> Optional[ParsedTransaction]:
             elif groups.count(None) == 2:
                 # Segregated Portfolio Entries
                 date, description, units, balance, *_ = groups
-            elif groups.count(None) == 4:
-                # Non financial Entry
-                date, description, *_ = groups
             elif groups.count(None) == 0:
                 # Normal entries
                 date, description, amount, units, nav, balance = groups
@@ -246,35 +231,3 @@ def process_detailed_text(text):
         "statement_period": statement_period,
         "folios": list(folios.values()),
     }
-
-# txtform = ""
-
-# for line in txt:
-#     txtform = txtform + line + ""
-
-output = process_detailed_text(raw)
-# print(output.keys())
-# print(len(output['folios']))
-# print(output['folios'][0].keys())
-# print(len(output['folios'][0]['schemes']))
-# print(output['folios'][0]['schemes'][0])
-# print(output['folios'][0]['schemes'][1]['transactions'])
-def view_parsed_txns(output):
-    """
-    take raw output and list out transactions per scheme for testing
-    """
-    for folio in output['folios']:
-        print(f"Folio: {folio['folio']}")
-        for scheme in folio['schemes']:
-            print(scheme['scheme'])
-            for transaction in scheme['transactions']:
-                if transaction:
-                    print(transaction['description'])
-        print(f"")
-
-view_parsed_txns(output)
-# print(parse_transaction('28-Sep-2021		*** Stamp Duty ***		0.50'))
-# print(parse_transaction('18-Aug-2021 ***Change of Gender***'))
-"""
-works on regexes: 28-Sep-2021		*** Stamp Duty ***		0.50
-"""
