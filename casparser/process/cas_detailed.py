@@ -273,6 +273,7 @@ def view_parsed_txns(output):
         print(f"")
 
 view_parsed_txns(output)
+# print(output)
 # print(parse_transaction('28-Sep-2021		*** Stamp Duty ***		0.50'))
 # print(parse_transaction('18-Aug-2021 ***Change of Gender***'))
 """

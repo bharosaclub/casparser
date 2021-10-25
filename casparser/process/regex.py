@@ -34,6 +34,6 @@ TRANSACTION_RE2 = rf"{date_re}\t\t([^0-9].*)\t\t{amt_re}\t\t{amt_re}(?:\t\t{amt_
 # Tax transactions
 TRANSACTION_RE3 = rf"{date_re}\t\t([^0-9].*)\t\t{amt_re}(?:\t\t{amt_re}\t\t{amt_re}\t\t{amt_re})*"
 # TRANSACTION_RE4 = rf"(\d{2}-[A-Za-z]{3}-\d{4}) ([^0-9].*)(?:\t\t([(-]*\d[\d,.]+)\)*\t\t([(-]*\d[\d,.]+)\)*\t\t([(-]*\d[\d,.]+)\)*\t\t([(-]*\d[\d,.]+)\)*)*"
-TRANSACTION_RE4 = rf"{date_re} ([^0-9].*)(?:\t\t{amt_re}\t\t{amt_re}\t\t{amt_re}\t\t{amt_re})*"
+TRANSACTION_RE4 = rf"{date_re} \*\*\*([^0-9].*)\*\*\*(?:\t\t{amt_re}\t\t{amt_re}\t\t{amt_re}\t\t{amt_re})*"
 DESCRIPTION_TAIL_RE = r"(\n.+?)(\t\t|$)"
 DIVIDEND_RE = r"(?:div\.|dividend|idcw).+?(reinvest)*.*?@\s*Rs\.\s*([\d\.]+)(?:\s+per\s+unit)?"
