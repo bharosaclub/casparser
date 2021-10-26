@@ -61,6 +61,8 @@ def get_transaction_type(
             txn_type = TransactionType.STAMP_DUTY_TAX
         elif "tds" in description:
             txn_type = TransactionType.TDS_TAX
+        elif "gender" in description:
+            txn_type = TransactionType.GENDER_CHANGE
         else:
             txn_type = TransactionType.MISC
     elif units > 0:
@@ -273,6 +275,7 @@ def view_parsed_txns(output):
         print(f"")
 
 view_parsed_txns(output)
+# print(parse_transaction('18-Aug-2021 **Change of Gender**'))
 # print(output)
 # print(parse_transaction('28-Sep-2021		*** Stamp Duty ***		0.50'))
 # print(parse_transaction('18-Aug-2021 ***Change of Gender***'))

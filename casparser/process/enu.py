@@ -52,6 +52,7 @@ class TransactionType(str, AutoEnum):
     STAMP_DUTY_TAX = auto()
     TDS_TAX = auto()
     SEGREGATION = auto()
+    GENDER_CHANGE = auto()
     MISC = auto()
     UNKNOWN = auto()
     REVERSAL = auto()
