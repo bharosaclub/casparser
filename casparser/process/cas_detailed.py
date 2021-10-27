@@ -4,13 +4,14 @@ import re
 from typing import Dict, Optional, Tuple
 
 from dateutil import parser as date_parser
-from regex import AMC_RE, DETAILED_DATE_RE, FOLIO_RE, SCHEME_RE, REGISTRAR_RE
-from regex import CLOSE_UNITS_RE, NAV_RE, OPEN_UNITS_RE, VALUATION_RE, DESCRIPTION_TAIL_RE
-from regex import DIVIDEND_RE, TRANSACTION_RE1, TRANSACTION_RE2, TRANSACTION_RE3, TRANSACTION_RE4
-from utils import isin_search
-from enu import TransactionType, CASFileType
-from typ import FolioType, SchemeType
-from excep import HeaderParseError, CASParseError
+from regex import AMC_RE, DETAILED_DATE_RE, FOLIO_RE, SCHEME_RE, REGISTRAR_RE #locally imported from same directory
+from regex import CLOSE_UNITS_RE, NAV_RE, OPEN_UNITS_RE, VALUATION_RE, DESCRIPTION_TAIL_RE #locally imported from same directory
+from regex import DIVIDEND_RE, TRANSACTION_RE1, TRANSACTION_RE2, TRANSACTION_RE3, TRANSACTION_RE4 #locally imported from same directory
+from utils import isin_search #locally imported from same directory
+from enu import TransactionType, CASFileType #locally imported from same directory
+from typ import FolioType, SchemeType #locally imported from same directory
+from excep import HeaderParseError, CASParseError #locally imported from same directory
+
 # from get_txt import raw : my source for raw text to be parsed
 ParsedTransaction = namedtuple(
     "ParsedTransaction", ("date", "description", "amount", "units", "nav", "balance")
@@ -234,7 +235,7 @@ def process_detailed_text(text):
         "folios": list(folios.values()),
     }
 
-def view_parsed_txns(output):
+def view_parsed_txns(output): # use for testing individual transaction lines
     """
     take raw output and list out transactions per scheme for testing
     """
