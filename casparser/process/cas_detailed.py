@@ -12,7 +12,20 @@ from enu import TransactionType, CASFileType #locally imported from same directo
 from typ import FolioType, SchemeType #locally imported from same directory
 from excep import HeaderParseError, CASParseError #locally imported from same directory
 
-# from get_txt import raw : my source for raw text to be parsed
+"""
+to get raw text to use for testing:
+ -> pip install pyperclip
+ -> go to the get_raw_text directory
+ -> copy the pdf you will be parsing into the same directory, rename it to 'test.pdf'
+ -> input your password into pwd.txt
+ -> run the get_raw_text.py
+ -> navigate to the casparser/processes directory
+ -> in final_text.py paste the text copied to your clipboard by the program between the '''''' so that it looks like '''raw text'''
+ -> raw cas text from pdf should be available to use in cas_detailed.py
+"""
+
+from final_text import raw #take copied text to clipboard from get_raw_text.py, paste between the '''''' such that it looks like '''raw text''' in final_text.py
+
 ParsedTransaction = namedtuple(
     "ParsedTransaction", ("date", "description", "amount", "units", "nav", "balance")
 )
@@ -114,7 +127,7 @@ def parse_transaction(line) -> Optional[ParsedTransaction]:
                 return ParsedTransaction(date, description, amount, units, nav, balance)
 
 
-def process_detailed_text(text):
+def process_detailed_text(text): #pass raw into this to use as output for view_parsed_txns or other uses
     """
     Process the text version of a CAS pdf and return the detailed summary.
     :param text:
@@ -247,3 +260,5 @@ def view_parsed_txns(output): # use for testing individual transaction lines
                 if transaction:
                     print(transaction['description'])
         print(f"")
+
+# print(view_parsed_txns(process_detailed_text(raw)))
