@@ -4,32 +4,18 @@ import re
 from typing import Dict, Optional, Tuple
 
 from dateutil import parser as date_parser
-from regex import AMC_RE, DETAILED_DATE_RE, FOLIO_RE, SCHEME_RE, REGISTRAR_RE #locally imported from same directory
-from regex import CLOSE_UNITS_RE, NAV_RE, OPEN_UNITS_RE, VALUATION_RE, DESCRIPTION_TAIL_RE #locally imported from same directory
-from regex import DIVIDEND_RE, TRANSACTION_RE1, TRANSACTION_RE2, TRANSACTION_RE3, TRANSACTION_RE4 #locally imported from same directory
-from utils import isin_search #locally imported from same directory
-from enu import TransactionType, CASFileType #locally imported from same directory
-from typ import FolioType, SchemeType #locally imported from same directory
-from excep import HeaderParseError, CASParseError #locally imported from same directory
 
-"""
-to get raw text to use for testing:
- -> pip install pyperclip
- -> go to the get_raw_text directory
- -> copy the pdf you will be parsing into the same directory, rename it to 'test.pdf'
- -> input your password into pwd.txt
- -> run the get_raw_text.py
- -> navigate to the casparser/processes directory
- -> in final_text.py paste the text copied to your clipboard by the program between the '''''' so that it looks like '''raw text'''
- -> raw cas text from pdf should be available to use in cas_detailed.py
-"""
-
-from final_text import raw #take copied text to clipboard from get_raw_text.py, paste between the '''''' such that it looks like '''raw text''' in final_text.py
+from ..enums import TransactionType, CASFileType
+from ..exceptions import HeaderParseError, CASParseError
+from .regex import AMC_RE, DETAILED_DATE_RE, FOLIO_RE, SCHEME_RE, REGISTRAR_RE
+from .regex import CLOSE_UNITS_RE, NAV_RE, OPEN_UNITS_RE, VALUATION_RE, DESCRIPTION_TAIL_RE
+from .regex import DIVIDEND_RE, TRANSACTION_RE1, TRANSACTION_RE2, TRANSACTION_RE3, TRANSACTION_RE4
+from ..types import FolioType, SchemeType
+from .utils import isin_search
 
 ParsedTransaction = namedtuple(
     "ParsedTransaction", ("date", "description", "amount", "units", "nav", "balance")
 )
-date_re = r"(\d{2}-[A-Za-z]{3}-\d{4})"
 
 def str_to_decimal(value: Optional[str]) -> Decimal:
     if isinstance(value, str):
@@ -64,8 +50,6 @@ def get_transaction_type(
             txn_type = TransactionType.STAMP_DUTY_TAX
         elif "tds" in description:
             txn_type = TransactionType.TDS_TAX
-        elif "gender" in description:
-            txn_type = TransactionType.GENDER_CHANGE
         else:
             txn_type = TransactionType.MISC
     elif units > 0:
@@ -248,17 +232,3 @@ def process_detailed_text(text): #pass raw into this to use as output for view_p
         "folios": list(folios.values()),
     }
 
-def view_parsed_txns(output): # use for testing individual transaction lines
-    """
-    take raw output and list out transactions per scheme for testing
-    """
-    for folio in output['folios']:
-        print(f"Folio: {folio['folio']}")
-        for scheme in folio['schemes']:
-            print(scheme['scheme'])
-            for transaction in scheme['transactions']:
-                if transaction:
-                    print(transaction['description'])
-        print(f"")
-
-# print(view_parsed_txns(process_detailed_text(raw)))
