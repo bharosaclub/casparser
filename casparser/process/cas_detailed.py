@@ -50,6 +50,10 @@ def get_transaction_type(
             txn_type = TransactionType.STAMP_DUTY_TAX
         elif "tds" in description:
             txn_type = TransactionType.TDS_TAX
+        elif "nominee" in description:
+            txn_type = TransactionType.NOMINEE_CHANGE
+        elif "address" in description:
+            txn_type = TransactionType.ADDRESS_CHANGE
         else:
             txn_type = TransactionType.MISC
     elif units > 0:
