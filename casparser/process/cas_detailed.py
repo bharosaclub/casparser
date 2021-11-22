@@ -54,8 +54,10 @@ def get_transaction_type(
             txn_type = TransactionType.NOMINEE_CHANGE
         elif "address" in description:
             txn_type = TransactionType.ADDRESS_CHANGE
+        elif "address" in description:
+            txn_type = TransactionType.GENDER_CHANGE
         else:
-            txn_type = TransactionType.MISC
+            txn_type = TransactionType.EVENT
     elif units > 0:
         if "switch" in description:
             if "merger" in description:
