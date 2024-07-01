@@ -134,3 +134,7 @@ tests/files/**
 .DS_Store
 
 casparser.code-workspace
+casparser/process/get_txt.py
+pwd.txt
+test.pdf
+get_raw_text/pwd.txt

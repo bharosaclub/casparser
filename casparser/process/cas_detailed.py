@@ -9,7 +9,7 @@ from ..enums import TransactionType, CASFileType
 from ..exceptions import HeaderParseError, CASParseError
 from .regex import AMC_RE, DETAILED_DATE_RE, FOLIO_RE, SCHEME_RE, REGISTRAR_RE
 from .regex import CLOSE_UNITS_RE, NAV_RE, OPEN_UNITS_RE, VALUATION_RE, DESCRIPTION_TAIL_RE
-from .regex import DIVIDEND_RE, TRANSACTION_RE1, TRANSACTION_RE2, TRANSACTION_RE3
+from .regex import DIVIDEND_RE, TRANSACTION_RE1, TRANSACTION_RE2, TRANSACTION_RE3, TRANSACTION_RE4
 from ..types import FolioType, SchemeType
 from .utils import isin_search
 
@@ -17,11 +17,9 @@ ParsedTransaction = namedtuple(
     "ParsedTransaction", ("date", "description", "amount", "units", "nav", "balance")
 )
 
-
 def str_to_decimal(value: Optional[str]) -> Decimal:
     if isinstance(value, str):
         return Decimal(value.replace(",", "_").replace("(", "-"))
-
 
 def parse_header(text):
     """
@@ -31,7 +29,6 @@ def parse_header(text):
     if m := re.search(DETAILED_DATE_RE, text, re.DOTALL | re.MULTILINE | re.I):
         return m.groupdict()
     raise HeaderParseError("Error parsing CAS header")
-
 
 def get_transaction_type(
     description: str, units: Optional[Decimal]
@@ -53,8 +50,14 @@ def get_transaction_type(
             txn_type = TransactionType.STAMP_DUTY_TAX
         elif "tds" in description:
             txn_type = TransactionType.TDS_TAX
+        elif "nominee" in description:
+            txn_type = TransactionType.NOMINEE_CHANGE
+        elif "address" in description:
+            txn_type = TransactionType.ADDRESS_CHANGE
+        elif "address" in description:
+            txn_type = TransactionType.GENDER_CHANGE
         else:
-            txn_type = TransactionType.MISC
+            txn_type = TransactionType.EVENT
     elif units > 0:
         if "switch" in description:
             if "merger" in description:
@@ -94,7 +97,7 @@ def get_transaction_type(
 
 
 def parse_transaction(line) -> Optional[ParsedTransaction]:
-    for regex in (TRANSACTION_RE1, TRANSACTION_RE2, TRANSACTION_RE3):
+    for regex in (TRANSACTION_RE1, TRANSACTION_RE2, TRANSACTION_RE3, TRANSACTION_RE4):
         if m := re.search(regex, line, re.DOTALL | re.MULTILINE | re.I):
             groups = m.groups()
             date = description = amount = units = nav = balance = None
@@ -104,6 +107,9 @@ def parse_transaction(line) -> Optional[ParsedTransaction]:
             elif groups.count(None) == 2:
                 # Segregated Portfolio Entries
                 date, description, units, balance, *_ = groups
+            elif groups.count(None) == 4:
+                # Non financial Entry
+                date, description, *_ = groups
             elif groups.count(None) == 0:
                 # Normal entries
                 date, description, amount, units, nav, balance = groups
@@ -111,7 +117,7 @@ def parse_transaction(line) -> Optional[ParsedTransaction]:
                 return ParsedTransaction(date, description, amount, units, nav, balance)
 
 
-def process_detailed_text(text):
+def process_detailed_text(text): #pass raw into this to use as output for view_parsed_txns or other uses
     """
     Process the text version of a CAS pdf and return the detailed summary.
     :param text:
@@ -231,3 +237,4 @@ def process_detailed_text(text):
         "statement_period": statement_period,
         "folios": list(folios.values()),
     }
+
